@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RVS RRB Railway NTPC PYQ PDF</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+}
+header {
+    background: #0a3d62;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.container {
+    padding: 15px;
+}
+.card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}
+input, textarea, button {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+button {
+    background: #0a3d62;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background: #07528a;
+}
+.notice {
+    background: #fff3cd;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+iframe {
+    width: 100%;
+    height: 400px;
+}
+.hidden { display: none; }
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #ddd;
+}
+.admin-btn {
+    background: orange;
+    color: black;
+    padding: 8px 12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h3>RVS RRB Railway NTPC PYQ PDF</h3>
+    <button class="admin-btn" onclick="showAdminLogin()">Admin Login</button>
+</header>
+
+<div class="container">
+
+<!-- ADMIN LOGIN -->
+<div class="card hidden" id="adminLoginBox">
+    <h3>Admin Login</h3>
+    <input type="text" id="adminUser" placeholder="Admin Username">
+    <input type="password" id="adminPass" placeholder="Admin Password">
+    <button onclick="adminLogin()">Login</button>
+</div>
+
+<!-- USER LOGIN -->
+<div class="card" id="loginBox">
+    <h3>User Login</h3>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p>New User?
+        <button onclick="showSignup()">Sign Up</button>
+    </p>
+</div>
+
+<!-- SIGNUP -->
+<div class="card hidden" id="signupBox">
+    <h3>User Signup</h3>
+    <input type="text" id="signupUser" placeholder="Username">
+    <input type="password" id="signupPass" placeholder="Password">
+    <button onclick="signup()">Create Account</button>
+    <button onclick="showLogin()">Back</button>
+</div>
+
+<!-- DASHBOARD -->
+<div class="card hidden" id="dashboard">
+    <h3>Welcome <span id="userName"></span></h3>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<!-- NOTICE -->
+<div class="card hidden" id="noticeSection">
+    <h3>Important Notice</h3>
+    <div id="noticeList"></div>
+</div>
+
+<!-- PDF -->
+<div class="card hidden" id="pdfSection">
+    <h3>PYQ PDF</h3>
+    <div id="pdfList"></div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="card hidden" id="adminPanel">
+    <h3>Admin Panel</h3>
+
+    <textarea id="noticeText" placeholder="Enter notice"></textarea>
+    <button onclick="addNotice()">Add Notice</button>
+
+    <input type="text" id="pdfName" placeholder="PDF Name">
+    <input type="text" id="pdfURL" placeholder="PDF URL">
+    <button onclick="addPDF()">Add PDF</button>
+</div>
+
+</div>
+
+<footer>© 2025 RVS Railway Education</footer>
+
+<script>
+// ADMIN CREDENTIAL
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin@2025";
+
+if (!localStorage.users) localStorage.users = JSON.stringify([]);
+if (!localStorage.notices) localStorage.notices = JSON.stringify([]);
+if (!localStorage.pdfs) localStorage.pdfs = JSON.stringify([]);
+
+function showAdminLogin(){
+    adminLoginBox.classList.toggle("hidden");
+}
+
+function adminLogin(){
+    if(adminUser.value === ADMIN_USER && adminPass.value === ADMIN_PASS){
+        alert("Admin Login Successful");
+        openDashboard("Admin", true);
+        adminLoginBox.classList.add("hidden");
+    } else {
+        alert("Wrong Admin Login");
+    }
+}
+
+function showSignup(){
+    loginBox.classList.add("hidden");
+    signupBox.classList.remove("hidden");
+}
+function showLogin(){
+    signupBox.classList.add("hidden");
+    loginBox.classList.remove("hidden");
+}
+
+function signup(){
+    let users = JSON.parse(localStorage.users);
+    users.push({user: signupUser.value, pass: signupPass.value});
+    localStorage.users = JSON.stringify(users);
+    alert("Account Created");
+    showLogin();
+}
+
+function login(){
+    let users = JSON.parse(localStorage.users);
+    let valid = users.find(u => u.user === loginUser.value && u.pass === loginPass.value);
+    if(valid){
+        openDashboard(valid.user, false);
+    } else {
+        alert("Invalid User Login");
+    }
+}
+
+function openDashboard(name, isAdmin){
+    loginBox.classList.add("hidden");
+    signupBox.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    noticeSection.classList.remove("hidden");
+    pdfSection.classList.remove("hidden");
+    userName.innerText = name;
+    loadNotices();
+    loadPDFs();
+    if(isAdmin) adminPanel.classList.remove("hidden");
+}
+
+function logout(){ location.reload(); }
+
+function addNotice(){
+    let n = JSON.parse(localStorage.notices);
+    n.push(noticeText.value);
+    localStorage.notices = JSON.stringify(n);
+    noticeText.value="";
+    loadNotices();
+}
+
+function loadNotices(){
+    noticeList.innerHTML="";
+    JSON.parse(localStorage.notices).forEach(n=>{
+        noticeList.innerHTML += `<div class="notice">${n}</div>`;
+    });
+}
+
+function addPDF(){
+    let p = JSON.parse(localStorage.pdfs);
+    p.push({name: pdfName.value, url: pdfURL.value});
+    localStorage.pdfs = JSON.stringify(p);
+    pdfName.value=""; pdfURL.value="";
+    loadPDFs();
+}
+
+function loadPDFs(){
+    pdfList.innerHTML="";
+    JSON.parse(localStorage.pdfs).forEach(p=>{
+        pdfList.innerHTML += `
+        <div>
+        <b>${p.name}</b>
+        <iframe src="${p.url}"></iframe>
+        <a href="${p.url}" download><button>Download</button></a>
+        </div>`;
+    });
+}
+</script>
+
+</body>
+</html>
